@@ -38,6 +38,7 @@ class ShopListFragment : Fragment(), RecyclerViewAdapter.OnItemClickListener {
         savedInstanceState?.run {
             recyclerViewItemList =
                 getParcelableArrayList<RecyclerViewItem>(ITEM_LIST) as ArrayList<RecyclerViewItem>
+            displayRecyclerViewItemList.addAll(recyclerViewItemList)
         }
         setHasOptionsMenu(true)
     }
@@ -64,7 +65,6 @@ class ShopListFragment : Fragment(), RecyclerViewAdapter.OnItemClickListener {
         if (!this::recyclerViewItemList.isInitialized) {
             recyclerViewItemList = arrayListOf()
         } else {
-            displayRecyclerViewItemList.addAll(recyclerViewItemList)
             comm.passDataCom(recyclerViewItemList)
             recyclerViewAdapter.notifyDataSetChanged()
         }
