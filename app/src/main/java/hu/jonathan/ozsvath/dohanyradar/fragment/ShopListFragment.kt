@@ -1,26 +1,23 @@
 package hu.jonathan.ozsvath.dohanyradar.fragment
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
-import androidx.fragment.app.Fragment
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
-import hu.jonathan.ozsvath.dohanyradar.*
-import kotlinx.android.synthetic.main.activity_main.*
+import hu.jonathan.ozsvath.dohanyradar.Communicator
+import hu.jonathan.ozsvath.dohanyradar.R
+import hu.jonathan.ozsvath.dohanyradar.RecyclerViewAdapter
+import hu.jonathan.ozsvath.dohanyradar.RecyclerViewItem
 import kotlinx.android.synthetic.main.fragment_shop_list.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-
-//private const val ARG_PARAM1 = "param1"
-//private const val ARG_PARAM2 = "param2"
 
 class ShopListFragment : Fragment(), RecyclerViewAdapter.OnItemClickListener {
 
@@ -66,7 +63,7 @@ class ShopListFragment : Fragment(), RecyclerViewAdapter.OnItemClickListener {
 
         if (!this::recyclerViewItemList.isInitialized) {
             recyclerViewItemList = arrayListOf()
-        }else{
+        } else {
             displayRecyclerViewItemList.addAll(recyclerViewItemList)
             comm.passDataCom(recyclerViewItemList)
             recyclerViewAdapter.notifyDataSetChanged()
