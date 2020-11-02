@@ -25,25 +25,23 @@ import kotlin.collections.ArrayList
 class ShopListFragment : Fragment(), RecyclerViewAdapter.OnItemClickListener {
 
     private val TAG = "ShopListFragment"
-    private val DETAILS_TAG = "details"
+    private val DETAILS_TAG = "Details"
+    private val ITEM_LIST = "recyclerViewItemList"
 
-    private val recyclerViewItemList = ArrayList<RecyclerViewItem>()
+    private lateinit var recyclerViewItemList: ArrayList<RecyclerViewItem>
     private val displayRecyclerViewItemList = ArrayList<RecyclerViewItem>()
     private val recyclerViewAdapter = RecyclerViewAdapter(displayRecyclerViewItemList, this)
     private var requestQueue: RequestQueue? = null
     private val url = "https://dohanyradar.codevisionkft.hu/tobbacoshop/"
 
-    private var param1: String? = null
-    private var param2: String? = null
-
     lateinit var comm: Communicator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        arguments?.let {
-//            param1 = it.getString(ARG_PARAM1)
-//            param2 = it.getString(ARG_PARAM2)
-//        }
+        savedInstanceState?.run {
+            recyclerViewItemList =
+                getParcelableArrayList<RecyclerViewItem>(ITEM_LIST) as ArrayList<RecyclerViewItem>
+        }
         setHasOptionsMenu(true)
     }
 
@@ -57,17 +55,30 @@ class ShopListFragment : Fragment(), RecyclerViewAdapter.OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val btnGoogleMaps = activity!!.findViewById<View>(R.id.btnGoogleMaps)
+        btnGoogleMaps.visibility = View.VISIBLE
+
         comm = activity as Communicator
 
         recycle_view.adapter = recyclerViewAdapter
         recycle_view.layoutManager = LinearLayoutManager(context)
         recycle_view.setHasFixedSize(true)
 
+        if (!this::recyclerViewItemList.isInitialized) {
+            recyclerViewItemList = arrayListOf()
+        }else{
+            displayRecyclerViewItemList.addAll(recyclerViewItemList)
+            comm.passDataCom(recyclerViewItemList)
+            recyclerViewAdapter.notifyDataSetChanged()
+        }
+
         if (recyclerViewItemList.isEmpty()) {
+            spinner.visibility = View.VISIBLE
+
             requestQueue = Volley.newRequestQueue(context)
 
             val jsonObjectRequest = JsonArrayRequest(Request.Method.GET, url, null,
-                Response.Listener { response ->
+                { response ->
                     for (i in 0 until response.length()) {
                         val actualObject = response.getJSONObject(i)
                         val item = RecyclerViewItem(
@@ -89,9 +100,12 @@ class ShopListFragment : Fragment(), RecyclerViewAdapter.OnItemClickListener {
 
                     comm.passDataCom(recyclerViewItemList)
 
+                    val btnGoogleMaps = activity!!.findViewById<View>(R.id.btnGoogleMaps)
+                    btnGoogleMaps.visibility = View.VISIBLE
+
                     spinner.visibility = View.INVISIBLE
                 },
-                Response.ErrorListener { error ->
+                { error ->
                     Toast.makeText(
                         context,
                         error.toString(),
@@ -107,24 +121,9 @@ class ShopListFragment : Fragment(), RecyclerViewAdapter.OnItemClickListener {
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ShopListFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
-//        fun newInstance(param1: String, param2: String) =
         fun newInstance() =
-            ShopListFragment().apply {
-//                arguments = Bundle().apply {
-//                    putString(ARG_PARAM1, param1)
-//                    putString(ARG_PARAM2, param2)
-//                }
-            }
+            ShopListFragment()
     }
 
 
@@ -182,4 +181,15 @@ class ShopListFragment : Fragment(), RecyclerViewAdapter.OnItemClickListener {
         super.onStop()
         requestQueue?.cancelAll(TAG)
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putParcelableArrayList(
+            ITEM_LIST,
+            ArrayList<RecyclerViewItem>(recyclerViewItemList)
+        )
+    }
+
+
 }

@@ -10,8 +10,8 @@ import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), Communicator {
     private val TAG = "MainActivityTag"
-    private val SHOP_LIST_TAG = "splash"
-    private val MAP_TAG = "map"
+    private val SHOP_LIST_TAG = "ShopList"
+    private val MAP_TAG = "Map"
     private lateinit var recyclerViewItemList: ArrayList<RecyclerViewItem>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity(), Communicator {
         }
 
         btnGoogleMaps.setOnClickListener {
-            var bundle = Bundle()
+            val bundle = Bundle()
             bundle.putParcelableArrayList(
                 "recyclerViewItemList",
                 ArrayList<RecyclerViewItem>(recyclerViewItemList)
@@ -43,7 +43,17 @@ class MainActivity : AppCompatActivity(), Communicator {
         }
 
         btnShopList.setOnClickListener {
-            supportFragmentManager.popBackStack()
+//            supportFragmentManager.popBackStack()
+            var shopListFragment = supportFragmentManager.findFragmentByTag(SHOP_LIST_TAG)
+
+            if (shopListFragment == null) {
+                shopListFragment = ShopListFragment.newInstance()
+            }
+
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragment_holder, shopListFragment, SHOP_LIST_TAG)
+                .commit()
         }
     }
 

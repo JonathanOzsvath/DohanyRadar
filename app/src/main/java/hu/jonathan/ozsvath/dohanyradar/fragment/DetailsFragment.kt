@@ -19,9 +19,7 @@ import kotlinx.android.synthetic.main.fragment_details.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_ID = "id"
-
 
 class DetailsFragment : Fragment() {
 
@@ -49,14 +47,17 @@ class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val btnGoogleMaps = activity!!.findViewById<View>(R.id.btnGoogleMaps)
+        btnGoogleMaps.visibility = View.INVISIBLE
+
         requestQueue = Volley.newRequestQueue(context)
 
         val imageRequest = ImageRequest(
             "$baseUrl$shopId/image",
-            Response.Listener<Bitmap> { response ->
+            { response ->
                 detailsImageView.setImageBitmap(response)
             }, 0, 0, ImageView.ScaleType.CENTER_CROP, null,
-            Response.ErrorListener { error ->
+            { error ->
                 Toast.makeText(
                     context,
                     error.toString(),
@@ -68,7 +69,7 @@ class DetailsFragment : Fragment() {
 
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET, baseUrl + shopId, null,
-            Response.Listener { response ->
+            { response ->
                 detailsName.text = response.getString("name")
                 detailsAddress.text = response.getString("address")
 
@@ -79,10 +80,14 @@ class DetailsFragment : Fragment() {
 
                 for (i in 0 until openOurArray.length()) {
 
-                    val openDate: Date = format.parse(response.getJSONArray("openHours")
-                        .getJSONObject(i).getString("openTime"))
-                    val closeDate: Date = format.parse(response.getJSONArray("openHours")
-                        .getJSONObject(i).getString("closeTime"))
+                    val openDate: Date = format.parse(
+                        response.getJSONArray("openHours")
+                            .getJSONObject(i).getString("openTime")
+                    )
+                    val closeDate: Date = format.parse(
+                        response.getJSONArray("openHours")
+                            .getJSONObject(i).getString("closeTime")
+                    )
 
                     openStr += "${formatOut.format(openDate)} - ${formatOut.format(closeDate)}\n"
                 }
@@ -94,8 +99,10 @@ class DetailsFragment : Fragment() {
                     val calendar: Calendar = Calendar.getInstance()
                     val day: Int = calendar.get(Calendar.DAY_OF_WEEK)
 
-                    val closeDate: Date = format.parse(response.getJSONArray("openHours")
-                        .getJSONObject(day - 1).getString("closeTime"))
+                    val closeDate: Date = format.parse(
+                        response.getJSONArray("openHours")
+                            .getJSONObject(day - 1).getString("closeTime")
+                    )
 
                     detailsIsOpen.text = "Zárva - Nyitás ${formatOut.format(closeDate)}"
                 }
@@ -104,7 +111,7 @@ class DetailsFragment : Fragment() {
 
                 detailsSpinner.visibility = View.INVISIBLE
             },
-            Response.ErrorListener { error ->
+            { error ->
                 Toast.makeText(
                     context,
                     error.toString(),
